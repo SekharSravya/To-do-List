@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="./jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div>
+    <div class="header">
+        <div id="test">
+            <span id="heading">To Do App</span>
+        </div>
+        <div id="triangle">
+        </div>
+    </div>
+    <div class="left">
+        <div id="left-title">
+            <span>Things to Do</span>
+        </div>
+        <div id="left-content">
+            <div id="input-item">
+                <input type="text" id="taskName" placeholder="My to do items">
+                <input type="text" id="taskDesc" placeholder="My description">
+                <button id="addTask">Add</button>
+            </div>
+            <div class="todoItems">
+                <ul id="taskList">
+                    <li>
+                        <input type="checkbox" name="todo-check" value="todo-in-group">
+                        <span>{{index}}</span>
+                        <span>{{name}}</span>
+                        <span>{{description}}</span>
+                        <button class="completeTask">Done</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div id="right-title">
+            <span>Things Done!</span>
+        </div>
+        <div id="right-content">
+            <div class="removeItems">
+                <ul id="doneList">
+                    <li>
+                        <input type="checkbox" name="done-check" value="done-in-group">
+                        <span>{{index}}</span>
+                        <span>{{name}}</span>
+                        <span>{{description}}</span>
+                        <button class="removeTask">Remove</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        (function () {
+            var elementName = document.getElementById("taskName");
+            var elementDesc = document.getElementById("taskDesc");
+
+            var elementAdd = document.getElementById("addTask");
+
+            var elementTaskList = document.getElementById("taskList");
+            var taskHTML = elementTaskList.innerHTML;
+            elementTaskList.innerHTML = "";
+            var elementDoneList = document.getElementById("doneList");
+            var doneHTML = elementDoneList.innerHTML;
+            elementDoneList.innerHTML = "";
+
+            var doneList=[];
+            var removeList =[];
+
+            elementAdd.onclick = addTask;
+            var todoList = JSON.parse(localStorage.getItem('todoList'));
+            if (!todoList) {
+                todoList = [];
+            }
+            else {
+                for (var i = 0; i < todoList.length; i++) {
+                    todoList[i].index = i+1;
+                    addTaskHTML("#taskList",todoList[i]);
+                }
+            }
+            var elementDoneParent = jQuery("#taskList");
+            var elementRemoveParent = jQuery("#doneList");
+
+            function addTaskHTML(id,task) {
+                jQuery(id).append(taskHTML.replace("{{index}}", task.index).replace("{{name}}", task.elementName).replace("{{description}}", task.elementDesc));
+            }
+
+            /*function addDoneHTML(id,task) {
+                jQuery(id).append(doneHTML.replace("{{index}}", task.index).replace("{{name}}", task.elementName).replace("{{description}}", task.elementDesc));
+            }
+            */
+            function addTask() {
+                var newTask = {};
+                newTask.index = todoList.length + 1;
+                newTask.elementName = elementName.value;
+                newTask.elementDesc = elementDesc.value;
+                todoList.push(newTask);
+                elementName.value = "";
+                elementDesc.value = "";
+                localStorage.setItem('todoList', JSON.stringify(todoList));
+                addTaskHTML("#taskList", newTask);
+            }
+
+            elementDoneParent.on("click", ".completeTask", function () {
+                var index= $($($(this).parent()).children()[1]).text();
+               // todoList.splice(index-1, 1);
+                var doneItem = todoList.splice(index-1, 1)[0];
+                doneItem.index = doneList.length +1;
+                doneList.push(doneItem);
+                console.log(doneList[0]);
+                localStorage.setItem('todoList', JSON.stringify(todoList));
+                $($($(this).parent()).parent()).empty();
+                addTaskHTML("#doneList", doneItem);
+                for (var i = 0; i < todoList.length; i++) {
+                    todoList[i].index = i+1;
+                    addTaskHTML("#taskList",todoList[i]);
+                }
+            });
+
+            elementRemoveParent.on("click", ".removeTask", function () {
+                console.log(abc);
+                var index= $($($(this).parent()).children()[1]).text();
+                doneList.splice(index-1,1);
+                $($($(this).parent()).parent()).empty();
+                addTaskHTML("#doneList", doneItem);
+                for (var i = 0; i < doneList.length; i++) {
+                    doneList[i].index = i+1;
+                    addTaskHTML("#doneList",doneList[i]);
+                }
+            });
+        })();
+    });
+
+</script>
+</html>
